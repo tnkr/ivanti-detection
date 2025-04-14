@@ -42,7 +42,7 @@ install_tool() {
         fi
         sudo apt-get install -y golang git
         sudo rm -rf /usr/local/bin/zgrab2 /tmp/zgrab2
-        git clone git@github.com:zmap/zgrab2.git /tmp/zgrab2
+        git clone https://github.com/zmap/zgrab2.git /tmp/zgrab2
         cd /tmp/zgrab2/cmd/zgrab2
         go build
         sudo mv zgrab2 /usr/local/bin/
@@ -61,7 +61,7 @@ install_tool() {
           sudo rm -rf /usr/local/bin/zgrab2 /tmp/zgrab2
         fi
         command -v go >/dev/null 2>&1 || { echo "[!] Go compiler not found. Please install Golang."; exit 1; }
-        git clone git@github.com:zmap/zgrab2.git /tmp/zgrab2
+        git clone https://github.com/zmap/zgrab2.git /tmp/zgrab2
         cd /tmp/zgrab2/cmd/zgrab2
         go build
         sudo mv zgrab2 /usr/local/bin/
