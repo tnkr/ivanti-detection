@@ -1,62 +1,51 @@
 # Ivanti VPN Detection Scanner
 
-This script scans IP addresses for signs of exposed **Ivanti Secure Access VPN** (formerly Pulse Secure) appliances by:
+This tool probes target IPs to detect the presence of Ivanti (formerly Pulse Secure) VPN login portals. It captures responses, uses regex matching for known Ivanti indicators, and optionally runs Nuclei templates to confirm the findings.
 
-1. Performing TLS JA3 fingerprinting with `zgrab2`
-2. Matching against known Ivanti JA3 hashes
-3. Probing likely endpoints with `nuclei`
-4. Capturing screenshots and metadata using `httpx`
-5. Generating a Markdown report
+## Requirements
 
----
+- Python 3.7+
+- `requests` module
+- [`nuclei`](https://github.com/projectdiscovery/nuclei) (installed and in your PATH)
 
-## Dependencies
-
-The script will check for and attempt to install the following tools:
-
-- [zgrab2](https://github.com/zmap/zgrab2) – TLS scanner with JA3 support (built from source)
-- [jq](https://stedolan.github.io/jq/) – JSON parser
-- [nuclei](https://github.com/projectdiscovery/nuclei) – Fast web vulnerability scanner
-- [httpx](https://github.com/projectdiscovery/httpx) – Web service probe + screenshot tool
-- `go` and `git` – required to build `zgrab2` from source
-
-The script supports both **Linux (apt)** and **macOS** environments.
-
----
+Install Python deps:
+```bash
+pip install requests
+```
 
 ## Usage
 
 ```bash
-./ivanti-scan.sh --targets targets.txt [--output results.csv] [--force-rebuild]
+python3 ivanti-scan.py --targets <path-to-ip-list> --output <output-file.csv>
 ```
 
-### Arguments:
-- `--targets` (required): Path to a text file with IPs or hostnames (one per line)
-- `--output` (optional): Output path for the final results file (default: `./ivanti_scan_results/final_results.csv`)
-- `--force-rebuild` (optional): Rebuilds `zgrab2` from scratch (cleans up old install)
-
----
+### Example:
+```bash
+python3 ivanti-scan.py --targets targets.txt --output ivanti-results.csv
+```
 
 ## Output
 
-After running, you will find:
-- `ivanti_candidates.txt` – IPs matching Ivanti JA3 fingerprint
-- `final_results.csv` – Matched targets from `nuclei`
-- `.httpx/screenshots/` – Screenshot previews
-- `httpx_output.json` – Service metadata
-- `report.md` – Human-readable Markdown summary
+After running, the tool generates:
 
----
+- `ivanti_scan_results/`
+  - `report.md`: Human-readable report with detection summary and Nuclei results
+  - `ivanti_candidates.txt`: Hosts matching Ivanti indicators
+  - `httpx_output.json`: Captured metadata from detected portals
+  - `raw_html/`: HTML responses saved per host
+  - `ivanti-templates/`: Nuclei detection template for confirmation scanning
 
-## Example
+## What It Detects
 
-```bash
-chmod +x ivanti-scan.sh
-./ivanti-scan.sh --targets mytargets.txt --output ivanti-results.csv --force-rebuild
-```
+The scanner flags hosts with pages containing:
 
----
+- Ivanti/Pulse branding
+- `/dana-na/auth/` path structure
+- Common login form patterns
+- Favicon or HTML titles like "SSL gateway"
 
-## 🔐 Legal Disclaimer
+## Future Ideas
 
-Only scan systems you own or are explicitly authorized to test. Unauthorized scanning may violate laws or terms of service.
+- HTML export of results
+- Slack/Discord alerts
+- Scan threading for faster bulk testing
